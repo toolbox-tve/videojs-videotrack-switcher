@@ -1,0 +1,20 @@
+// Sass for videojs-videotrack-switcher
+
+.video-js button{
+
+  // This class is added to the video.js element by the plugin by default.
+  &.vjs-videotrack-switcher {
+    display: block;
+
+    &.vjs-icon-audio {
+      color: #73859f;
+    }
+    &.vjs-da-enabled.vjs-icon-audio {
+      color: #fff;
+    }
+    &.vjs-icon-audio:hover {
+      color: #fff;
+      cursor: pointer;
+    }
+  }
+}

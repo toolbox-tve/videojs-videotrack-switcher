@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>videojs-videotrack-switcher Demo</title>
+  <link href="node_modules/video.js/dist/video-js.css" rel="stylesheet">
+  <link href="dist/videojs-videotrack-switcher.css" rel="stylesheet">
+</head>
+<body>
+  <video id="videojs-videotrack-switcher-player" class="video-js vjs-default-skin" controls>
+    <source src="//vjs.zencdn.net/v/oceans.mp4" type="video/mp4" 
+      kind="main" language="en" label="English">
+    <source src="//commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" type="video/mp4" 
+      language="fr">
+  </video>
+  <ul>
+    <li><a href="test/">Run unit tests in browser.</a></li>
+    <li><a href="dist/docs/api/">Read generated api docs.</a></li>
+    <li><a href="dist/docs/manual/">Read generated manual docs.</a></li>
+  </ul>
+  <script src="node_modules/video.js/dist/video.js"></script>
+  <script src="dist/videojs-videotrack-switcher.js"></script>
+  <script>
+    (function(window, videojs) {
+      var player = window.player = videojs('videojs-videotrack-switcher-player');
+
+      player.videotrackSwitcher({
+        defaultSelected: 0, // Index for the source consider as 'main' if not set in tracksList
+        sourceTracks: null // Can set from videojs config sources.
+      });
+    }(window, window.videojs));
+  </script>
+</body>
+</html>
