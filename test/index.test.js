@@ -9,7 +9,7 @@ const Player = videojs.getComponent('Player');
 
 QUnit.module('sanity tests');
 
-QUnit.test('the environment is sane', function(assert) {
+QUnit.test('the environment is sane', assert => {
   assert.strictEqual(typeof Array.isArray, 'function', 'es5 exists');
   assert.strictEqual(typeof sinon, 'object', 'sinon exists');
   assert.strictEqual(typeof videojs, 'function', 'videojs exists');
@@ -17,6 +17,11 @@ QUnit.test('the environment is sane', function(assert) {
 });
 
 QUnit.module('videojs-videotrack-switcher', {
+
+  afterEach() {
+    this.player.dispose();
+    this.clock.restore();
+  },
 
   beforeEach() {
 
@@ -30,15 +35,10 @@ QUnit.module('videojs-videotrack-switcher', {
     this.video = document.createElement('video');
     this.fixture.appendChild(this.video);
     this.player = videojs(this.video);
-  },
-
-  afterEach() {
-    this.player.dispose();
-    this.clock.restore();
   }
 });
 
-QUnit.test('registers itself with video.js', function(assert) {
+QUnit.test('registers itself with video.js', assert => {
   assert.expect(2);
 
   assert.strictEqual(
@@ -51,16 +51,16 @@ QUnit.test('registers itself with video.js', function(assert) {
     defaultSelected: 0,
     sourceTracks: [
       {
-        url: '//english_video.mp4',
-        type: 'video/mp4',
         kind: 'main',
+        label: 'Enligsh',
         language: 'en',
-        label: 'Enligsh'
+        type: 'video/mp4',
+        url: '//english_video.mp4'
       },
       {
-        url: '//french_video.mp4',
+        language: 'fr',
         type: 'video/mp4',
-        language: 'fr'
+        url: '//french_video.mp4'
       }
     ]
   });

@@ -2,7 +2,7 @@
  * @file fn.js
  * @module fn
  */
-import { newGUID } from './guid';
+import {newGUID} from './guid';
 
 /**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function
@@ -20,24 +20,26 @@ import { newGUID } from './guid';
  * @return {Function}
  *         The new function that will be bound into the context given
  */
-export const bind = function(context, fn, uid) {
+export const bind = (context, fn, uid) => {
   // Make sure the function has a unique ID
   if (!fn.guid) {
     fn.guid = newGUID();
   }
 
   // Create the new function that changes the context
-  const bound = function() {
-    return fn.apply(context, arguments);
+  const bound = () => {
+
+    return Reflect.apply(fn, context, arguments);
   };
 
   // Allow for the ability to individualize this function
   // Needed in the case where multiple objects might share the same prototype
-  // IF both items add an event listener with the same function, then you try to remove just one
+  // IF both items add an event listener with the same function,
+  // then you try to remove just one
   // it will remove both because they both have the same guid.
   // when using this, you need to use the bind method when you remove the listener as well.
   // currently used in text tracks
-  bound.guid = (uid) ? uid + '_' + fn.guid : fn.guid;
+  bound.guid = (uid) ? `${uid}_${fn.guid}` : fn.guid;
 
   return bound;
 };
@@ -49,15 +51,16 @@ export const bind = function(context, fn, uid) {
  * @param  {Function} fn
  *         The function to be throttled.
  *
- * @param  {Number}   wait
+ * @param  {number}   wait
  *         The number of milliseconds by which to throttle.
  *
  * @return {Function}
+ *         Returns a function
  */
-export const throttle = function(fn, wait) {
+export const throttle = (fn, wait) => {
   let last = Date.now();
 
-  const throttled = function(...args) {
+  const throttled = (...args) => {
     const now = Date.now();
 
     if (now - last >= wait) {

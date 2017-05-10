@@ -23,7 +23,7 @@ class VideoTrackMenuItem extends MenuItem {
    *        The key/value store of player options.
    */
   constructor(player, options) {
-    const track = options.track;
+    const {track} = options;
     const tracks = player.videoTracks();
 
     // Modify options for parent MenuItem class's init.
@@ -36,26 +36,28 @@ class VideoTrackMenuItem extends MenuItem {
     const changeHandler = Fn.bind(this, this.handleTracksChange);
 
     tracks.addEventListener('change', changeHandler);
-    this.on('dispose', function() {
+    this.on('dispose', () => {
       tracks.removeEventListener('change', changeHandler);
     });
 
   }
 
   /**
+   * Click track item in list handler
    *
-   * @param event
+   *  @param {Event} e
+   *    click event object
    */
-  handleClick(event) {
+  handleClick(e) {
     const tracks = this.player_.videoTracks();
 
-    super.handleClick(event);
+    super.handleClick(e);
 
     if (!tracks || tracks.length < 2) {
       return;
     }
 
-    for (let i = 0; i < tracks.length; i++) {
+    for (let i = 0; i < tracks.length; i += 1) {
       const track = tracks[i];
 
       track.selected = track === this.track;
@@ -66,12 +68,12 @@ class VideoTrackMenuItem extends MenuItem {
   /**
    * Handle text track list change
    *
-   * @param {EventTarget~Event} event
+   * @param {Event} e
    *        The `change` event that caused this function to be called.
    *
    * @listens TextTrackList#change
    */
-  handleTracksChange(event) {
+  handleTracksChange(e) {
 
     this.selected(this.track.selected);
   }
