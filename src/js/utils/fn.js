@@ -2,7 +2,7 @@
  * @file fn.js
  * @module fn
  */
-import { newGUID } from './guid.js';
+import { newGUID } from './guid';
 
 /**
  * Bind (a.k.a proxy or Context). A simple method for changing the context of a function

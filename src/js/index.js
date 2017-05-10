@@ -26,50 +26,18 @@ class VideotrackSwitcher extends Plugin {
     super(player, options);
     this.options = videojs.mergeOptions(defaults, options);
 
-    // If tracksList is not provided the VideoTracksList 
+    // If tracksList is not provided the VideoTracksList
     // try to generate from current sources:
-    let sources = this.options.sourceTracks = player.currentSources();
+    const sources = this.options.sourceTracks = player.currentSources();
 
-    if (!(typeof(sources) !== 'undefined' && sources.length && sources.length > 1)) {
+    if (!(typeof sources !== 'undefined' && sources.length && sources.length > 1)) {
       // Disable plugin control if no valid source was found:
       return;
     }
 
-    player.one('loadstart', () => {
-      let currentVideoTracks = this.generateVideoTracks(sources); 
-      let currentOptions = this.options;
+    player.one('loadstart', this.handleInitialize.bind(this));
 
-      if (currentVideoTracks.length > 1) {
-        
-        currentVideoTracks.map(videoTrack => {
-          this.player.videoTracks().addTrack(videoTrack);
-        });
-
-         this.player.videoTracks().addEventListener('change', (e) => {
-          const thisTrackList = this.player.videoTracks();
-
-          if (thisTrackList.selectedIndex === -1) {
-            return;
-          }
-
-          let trackID = thisTrackList[thisTrackList.selectedIndex].id;
-          let source = currentOptions.sourceTracks.find(item => {
-            return item.id === trackID;
-          });
-
-          //this.player.setStartTime(this.player.currentTime()); // Setea el tiempo en el source actual para mantenerlo en el siguiente
-          this.player.src(source);
-        });
-        
-        currentOptions.videoTracksList = player.videoTracks();
-        let toggle = this.player.controlBar.addChild('VideoTrackMenuToggle', currentOptions);
-
-        this.player.controlBar.el()
-        .insertBefore(toggle.el(), this.player.controlBar.fullscreenToggle.el());
-      }
-
-    });
-
+    player.on('loadstart', this.handleSourceChange.bind(this));
 
     player.ready(() => {
       this.player.addClass('vjs-videotrack-switcher');
@@ -88,6 +56,62 @@ class VideotrackSwitcher extends Plugin {
    */
   handleStateChanged(e) {}
 
+
+  /**
+   * Handles once on "loadstart" player event to setup the initialization
+   * and generation of the videoTracks detected.
+   * @param    {Event} e
+   *           An event object provided by a "loadstart" event.
+   */
+  handleInitialize(e) {
+    const sources = this.options.sourceTracks;
+    const currentVideoTracks = this.generateVideoTracks(sources);
+    const currentOptions = this.options;
+
+    if (currentVideoTracks.length > 1) {
+
+      currentVideoTracks.map(videoTrack => {
+        this.player.videoTracks().addTrack(videoTrack);
+      });
+
+      this.player.videoTracks().addEventListener('change', (e) => {
+        // Save current time to continue on alternative track if continue is true:
+        currentOptions.bookmarkTime = this.player.currentTime();
+        const thisTrackList = this.player.videoTracks();
+
+        if (thisTrackList.selectedIndex === -1) {
+          return;
+        }
+
+        const trackID = thisTrackList[thisTrackList.selectedIndex].id;
+        const source = currentOptions.sourceTracks.find(item => {
+          return item.id === trackID;
+        });
+
+        this.player.src(source);
+      });
+
+      currentOptions.videoTracksList = player.videoTracks();
+      const toggle = this.player.controlBar.addChild('VideoTrackMenuToggle', currentOptions);
+
+      this.player.controlBar.el()
+      .insertBefore(toggle.el(), this.player.controlBar.fullscreenToggle.el());
+    }
+  }
+
+/**
+   * Handles on "loadstart" player event to setup the track playback.
+   * @param    {Event} e
+   *           An event object provided by a "loadstart" event.
+   */
+  handleSourceChange(e) {
+
+      if (this.options.continued && this.options.bookmarkTime) {
+        this.player.currentTime(this.options.bookmarkTime);
+      }
+  }
+
+
   /**
    * Generates a list of valid videoTracks from an array of sources.
    */
@@ -95,7 +119,7 @@ class VideotrackSwitcher extends Plugin {
     const pluginOpts = this.options;
     const playableSource = this.player.currentSource();
     const currentTech = videojs.getTech(this.player.techName_);
-    let tracksDetected = [];
+    const tracksDetected = [];
 
     if (!(currentSources && playableSource && currentTech)) {
       return tracksDetected;
@@ -103,9 +127,9 @@ class VideotrackSwitcher extends Plugin {
 
     // Gets alternative source videos that are playable on the current browser instance.
     currentSources.filter((item, index, self) => {
-        let canTechPlay = currentTech.canPlaySource(item);
-        let playable = (canTechPlay === '' || canTechPlay === false) ? false : true;
-        let hasLanguage = item.language && item.language !== '';
+        const canTechPlay = currentTech.canPlaySource(item);
+        const playable = (canTechPlay === '' || canTechPlay === false) ? false : true;
+        const hasLanguage = item.language && item.language !== '';
 
         // Returns only playable with valid language property (filter duplicate language)        
         if (playable && !hasLanguage) {
@@ -117,10 +141,10 @@ class VideotrackSwitcher extends Plugin {
           self.findIndex(t => t.language === item.language) === index;
       })
       .forEach((item, index) => {
-          let track = new videojs.VideoTrack({
+          const track = new videojs.VideoTrack({
             id: item.id,
             kind: item.kind,
-            label: item.label || item.language, //If label is not provided set the language as label.
+            label: item.label || item.language, // If label is not provided set the language as label.
             language: item.language
           });
 
@@ -135,11 +159,9 @@ class VideotrackSwitcher extends Plugin {
             if (pluginOpts.defaultSelected === index) {
               track.selected = true;
             }
-          } else {
+          } else if (index === 0) {
             // First track is selected:
-            if (index === 0) {
-              track.selected = true;
-            }
+            track.selected = true;
           }
 
           tracksDetected.push(track);

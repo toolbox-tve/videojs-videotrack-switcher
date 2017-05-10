@@ -2,7 +2,7 @@
  * @file videotrack-menu-item.js
  */
 import videojs from 'video.js';
-import * as Fn from '../utils/fn.js';
+import * as Fn from './utils/fn';
 
 const MenuItem = videojs.getComponent('MenuItem');
 

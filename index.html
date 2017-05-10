@@ -26,6 +26,7 @@
 
       player.videotrackSwitcher({
         defaultSelected: 0, // Index for the source consider as 'main' if not set in tracksList
+        continued: true, // If true the playback continued at last position when track changes.
         sourceTracks: null // Can set from videojs config sources.
       });
     }(window, window.videojs));
