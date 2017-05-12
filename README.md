@@ -1,12 +1,26 @@
 # videojs-videotrack-switcher
 
-This VideoJS plugin add button switcher for videotracks
+This VideoJS plugin add button switcher for videotracks when player is setted
+with an array of sources thtat includes VideoTracks attributes (http://docs.videojs.com/docs/guides/video-tracks.html)
 
 ## Table of Contents
 
+- [Installation](#installation)
+- [Usage](#usage)
+  - [<script> Tag](#script-tag)
+  - [Browserify](#browserify)
+  - [RequireJS/AMD](#requirejs-amd)
+- [Plugin options](#plugin-options)
+- [License](#license)
+
 <!-- START doctoc -->
 <!-- END doctoc -->
+
+
+
 ## Installation
+
+Install via npm (preferred):
 
 ```sh
 npm install --save videojs-videotrack-switcher
@@ -58,6 +72,22 @@ require(['video.js', 'videojs-videotrack-switcher'], function(videojs) {
   player.videotrackSwitcher();
 });
 ```
+
+## Plugin Options
+
+#### defaultSelected
+* Type: `number`
+* Optional
+
+Indicates the track index selected to play first. (If browser can play it).
+If it is not specified, the first one with the `kind` attribute 'main' is selected.
+
+#### continued
+* Type: `boolean`
+* Optional
+
+When `continued` is set to `true` the playback continued at last position when track changes.
+
 
 ## License
 

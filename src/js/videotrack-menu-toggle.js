@@ -33,7 +33,7 @@ class VideoTrackMenuToggle extends MenuButton {
    * @return {string} CSS class
    */
   buildCSSClass() {
-    return `vjs-icon-audio ${super.buildCSSClass()}`;
+    return `vjs-videotrack-switcher vjs-icon-audio ${super.buildCSSClass()}`;
   }
 
   /**
