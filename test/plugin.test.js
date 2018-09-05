@@ -1,15 +1,14 @@
 import document from 'global/document';
-import QUnit from 'qunitjs';
+
+import QUnit from 'qunit';
 import sinon from 'sinon';
 import videojs from 'video.js';
 
-import plugin from '../src/js/index.js';
+import plugin from '../src/plugin';
 
 const Player = videojs.getComponent('Player');
 
-QUnit.module('sanity tests');
-
-QUnit.test('the environment is sane', assert => {
+QUnit.test('the environment is sane', function(assert) {
   assert.strictEqual(typeof Array.isArray, 'function', 'es5 exists');
   assert.strictEqual(typeof sinon, 'object', 'sinon exists');
   assert.strictEqual(typeof videojs, 'function', 'videojs exists');
@@ -17,11 +16,6 @@ QUnit.test('the environment is sane', assert => {
 });
 
 QUnit.module('videojs-videotrack-switcher', {
-
-  afterEach() {
-    this.player.dispose();
-    this.clock.restore();
-  },
 
   beforeEach() {
 
@@ -35,10 +29,15 @@ QUnit.module('videojs-videotrack-switcher', {
     this.video = document.createElement('video');
     this.fixture.appendChild(this.video);
     this.player = videojs(this.video);
+  },
+
+  afterEach() {
+    this.player.dispose();
+    this.clock.restore();
   }
 });
 
-QUnit.test('registers itself with video.js', assert => {
+QUnit.test('registers itself with video.js', function(assert) {
   assert.expect(2);
 
   assert.strictEqual(
@@ -47,23 +46,7 @@ QUnit.test('registers itself with video.js', assert => {
     'videojs-videotrack-switcher plugin was registered'
   );
 
-  this.player.videotrackSwitcher({
-    defaultSelected: 0,
-    sourceTracks: [
-      {
-        kind: 'main',
-        label: 'Enligsh',
-        language: 'en',
-        type: 'video/mp4',
-        url: '//english_video.mp4'
-      },
-      {
-        language: 'fr',
-        type: 'video/mp4',
-        url: '//french_video.mp4'
-      }
-    ]
-  });
+  this.player.videotrackSwitcher();
 
   // Tick the clock forward enough to trigger the player to be "ready".
   this.clock.tick(1);
